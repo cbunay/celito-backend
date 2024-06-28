@@ -12,8 +12,6 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
-import { Role } from './constants';
-import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +25,7 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @Roles(Role.USER)
+ 
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

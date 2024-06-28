@@ -1,10 +1,11 @@
 
 import * as bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from '../auth/constants';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,7 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) { }
 
-  async create(createUserDto: CreateUserDto): Promise<{ id: number }> {
+  async create(createUserDto: CreateUserDto): Promise<{ id: number, username: string, role: Role }> {
     const user = new User();
     const salt = await bcrypt.genSalt();
     const passHash = await bcrypt.hash(createUserDto.password, salt);
@@ -22,23 +23,34 @@ export class UsersService {
     user.password = passHash;
     user.role = createUserDto.role;
 
-    const { id } = await this.usersRepository.save(user);
-    return { id };
+    const { id, username, role } = await this.usersRepository.save(user);
+    return { id, username, role };
   }
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User> {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 
-  async findUsername(username: string): Promise<User | undefined> {
-    return this.usersRepository.findOneBy({ username });
+  async findUsername(username: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ username });
+    if (!user) {
+      throw new NotFoundException(`User with username \`${username}\` not found`);
+    }
+    return user;
   }
 
   async remove(id: string): Promise<void> {
-    await this.usersRepository.delete(id);
+    const result = await this.usersRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
   }
 }
