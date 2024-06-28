@@ -21,7 +21,7 @@ export class AuthService {
       const { password, ...result } = user;
       return result;
     } else {
-      throw new BadRequestException('Bab credentials');
+      throw new BadRequestException('Invalid credentials');
     }
     return null;
   }
