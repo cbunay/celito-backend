@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt'
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { Role } from './constants';
@@ -20,6 +20,8 @@ export class AuthService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
+    } else {
+      throw new BadRequestException('Bab credentials');
     }
     return null;
   }
