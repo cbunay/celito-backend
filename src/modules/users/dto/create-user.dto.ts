@@ -1,5 +1,7 @@
+import { Role } from "../../../modules/auth/constants";
+
 export class CreateUserDto {
   username: string;
   password: string;
-  role: string;
+  role: Role;
 }

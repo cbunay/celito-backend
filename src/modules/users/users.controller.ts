@@ -7,10 +7,10 @@ import {
   Post,
   ParseIntPipe,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -18,7 +18,7 @@ export class UsersController {
 
   @Public()
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  create(@Body() createUserDto: CreateUserDto): Promise<{ id: number }> {
     return this.usersService.create(createUserDto);
   }
 
