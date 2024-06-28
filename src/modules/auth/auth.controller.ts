@@ -12,8 +12,8 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
-import { Roles } from './decorators/roles.decorator';
 import { Role } from './constants';
+import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -27,15 +27,17 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
   }
 
   @Public()
+  @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  create(@Body() registerUserDto: RegisterUserDto): Promise<{ id: number }> {
-    return this.authService.register(registerUserDto);
+  async create(@Body() registerUserDto: RegisterUserDto): Promise<{ id: number, message: string }> {
+    const { id } = await this.authService.register(registerUserDto);
+    return { id, message: 'User successfully registered' }
   }
 }
